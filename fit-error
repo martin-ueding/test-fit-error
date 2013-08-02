@@ -16,6 +16,7 @@ def main():
     y_err = np.random.normal(size=x.shape) / 10
 
     np.savetxt("data.txt", np.column_stack([x, y, y_err]))
+    np.savetxt("data2.txt", np.column_stack([x, y, 2*y_err]))
 
     def linear(x, a, b):
         return a * x + b
@@ -23,13 +24,13 @@ def main():
     print("Mit normalen Fehler:")
     popt, pconv = op.curve_fit(linear, x, y, sigma=y_err)
     print("Parameter:", popt)
-    print("Varianz:  ", pconv.diagonal())
+    print("Fehler:  ", np.sqrt(pconv.diagonal()))
     print()
 
     print("Mit doppeltem Fehler:")
     popt, pconv = op.curve_fit(linear, x, y, sigma=2*y_err)
     print("Parameter:", popt)
-    print("Varianz:  ", pconv.diagonal())
+    print("Fehler:  ", np.sqrt(pconv.diagonal()))
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,7 @@
+#!/usr/bin/gnuplot -p
+# Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
+
+f(x) = a * x + b
+
+fit f(x) "data.txt" using 1:2:3 via a,b
+fit f(x) "data2.txt" using 1:2:3 via a,b
