@@ -1,0 +1,35 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
+
+import numpy as np
+import scipy.optimize as op
+
+__docformat__ = "restructuredtext en"
+
+def main():
+    x = np.linspace(0, 10, 10)
+    y = 2 * x + 3
+    random = np.random.normal(size=x.shape) / 10
+    y += random
+    y_err = np.random.normal(size=x.shape) / 10
+
+    np.savetxt("data.txt", np.column_stack([x, y, y_err]))
+
+    def linear(x, a, b):
+        return a * x + b
+
+    print("Mit normalen Fehler:")
+    popt, pconv = op.curve_fit(linear, x, y, sigma=y_err)
+    print("Parameter:", popt)
+    print("Varianz:  ", pconv.diagonal())
+    print()
+
+    print("Mit doppeltem Fehler:")
+    popt, pconv = op.curve_fit(linear, x, y, sigma=2*y_err)
+    print("Parameter:", popt)
+    print("Varianz:  ", pconv.diagonal())
+
+if __name__ == "__main__":
+    main()
