@@ -6,6 +6,7 @@
 
 import numpy as np
 import scipy.optimize as op
+import scipy.odr
 
 __docformat__ = "restructuredtext en"
 
@@ -29,20 +30,38 @@ def linear(x, a, b):
     '''
     return a * x + b
 
+def linear_p(p, x):
+    a, b = p
+    return linear(x, a, b)
+
 def fit_with_curve_fit(x, y, y_err):
     popt, pconv = op.curve_fit(linear, x, y, sigma=y_err)
     print("Parameters:", popt)
     print("Errors:    ", np.sqrt(pconv.diagonal()))
 
+def fit_with_odr(x, y, y_err):
+    model = scipy.odr.Model(linear_p)
+    data = scipy.odr.RealData(x, y, sy=y_err)
+    odr = scipy.odr.ODR(data, model, beta0=[1, 1])
+    out = odr.run()
+    out.pprint()
+
 def main():
     x, y, y_err = generate_data()
-
 
     print("Fit with scipy.optimize.curve_fit:")
     fit_with_curve_fit(x, y, y_err)
     print()
     print("Same but with 2 * y_err:")
     fit_with_curve_fit(x, y, 2 * y_err)
+
+    print()
+
+    print("Fit with scipy.odr:")
+    fit_with_odr(x, y, y_err)
+    print()
+    print("Same but with 2 * y_err:")
+    fit_with_odr(x, y, 2 * y_err)
 
 if __name__ == "__main__":
     main()
