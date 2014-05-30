@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2013-2014 Martin Ueding <dev@martin-ueding.de>
 # Licensed under The GNU Public License Version 2 (or later)
 
 import numpy as np
@@ -9,29 +9,40 @@ import scipy.optimize as op
 
 __docformat__ = "restructuredtext en"
 
-def main():
+def generate_data():
+    '''
+    Generates some random data.
+    '''
     x = np.linspace(0, 10, 10)
     y = 2 * x + 3
     random = np.random.normal(size=x.shape) / 10
     y += random
     y_err = np.random.normal(size=x.shape) / 10
 
-    np.savetxt("data.txt", np.column_stack([x, y, y_err]))
-    np.savetxt("data2.txt", np.column_stack([x, y, 2*y_err]))
+    return x, y, y_err
 
-    def linear(x, a, b):
-        return a * x + b
+def linear(x, a, b):
+    '''
+    Linear function.
 
-    print("Mit normalen Fehler:")
+    This is just :math:`\\text{linear}(x; a, b) = a x + b`.
+    '''
+    return a * x + b
+
+def fit_with_curve_fit(x, y, y_err):
     popt, pconv = op.curve_fit(linear, x, y, sigma=y_err)
-    print("Parameter:", popt)
-    print("Fehler:  ", np.sqrt(pconv.diagonal()))
-    print()
+    print("Parameters:", popt)
+    print("Errors:    ", np.sqrt(pconv.diagonal()))
 
-    print("Mit doppeltem Fehler:")
-    popt, pconv = op.curve_fit(linear, x, y, sigma=2*y_err)
-    print("Parameter:", popt)
-    print("Fehler:  ", np.sqrt(pconv.diagonal()))
+def main():
+    x, y, y_err = generate_data()
+
+
+    print("Fit with scipy.optimize.curve_fit:")
+    fit_with_curve_fit(x, y, y_err)
+    print()
+    print("Same but with 2 * y_err:")
+    fit_with_curve_fit(x, y, 2 * y_err)
 
 if __name__ == "__main__":
     main()
