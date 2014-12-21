@@ -7,6 +7,7 @@
 import numpy as np
 import scipy.optimize as op
 import scipy.odr
+import linfit
 
 __docformat__ = "restructuredtext en"
 
@@ -46,6 +47,11 @@ def fit_with_odr(x, y, y_err):
     out = odr.run()
     out.pprint()
 
+def fit_with_linfit(x, y, y_err, relsigma=False):
+    popt, pconv = linfit.linfit(x, y, y_err, cov=True, relsigma=relsigma)
+    print("Parameters:", popt)
+    print("Errors:    ", np.sqrt(pconv.diagonal()))
+
 def main():
     x, y, y_err = generate_data()
 
@@ -60,8 +66,24 @@ def main():
     print("Fit with scipy.odr:")
     fit_with_odr(x, y, y_err)
     print()
-    print("Same but with 2 * y_err:")
-    fit_with_odr(x, y, 2 * y_err)
+    print("Same but with 20 * y_err:")
+    fit_with_odr(x, y, 20 * y_err)
+
+    print()
+
+    print("Fit with linfit:")
+    fit_with_linfit(x, y, y_err)
+    print()
+    print("Same but with 20 * y_err:")
+    fit_with_linfit(x, y, 20 * y_err)
+
+    print()
+
+    print("Fit with linfit(relsigma=True):")
+    fit_with_linfit(x, y, y_err, True)
+    print()
+    print("Same but with 20 * y_err:")
+    fit_with_linfit(x, y, 20 * y_err, True)
 
 if __name__ == "__main__":
     main()
